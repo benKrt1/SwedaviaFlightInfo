@@ -114,3 +114,43 @@ async def test_menu_invalid_airport_reprompts(monkeypatch, capsys):
     )
     err = capsys.readouterr().err
     assert "ZZZ" in err or "Invalid" in err
+
+
+# --- rolling into next days ---
+
+async def test_collect_upcoming_rolls_into_next_day(monkeypatch):
+    async def fake_fetch(airport, direction, date):
+        # only the next day has flights; today is empty
+        return raw("departures_arn.json") if date == "2026-06-18" else []
+
+    monkeypatch.setattr(service, "fetch_flights", fake_fetch)
+
+    result = await menu.collect_upcoming(
+        "ARN", "departure", "2026-06-17T23:00:00Z"
+    )
+    assert result, "should have pulled flights from the next day"
+    assert any(f.flightNumber == "SK1401" for f in result)
+
+
+# --- airport list picker ---
+
+async def test_airport_list_pick_by_number(monkeypatch, capsys):
+    async def fake_fetch(airport, direction, date):
+        return raw("departures_arn.json")
+
+    monkeypatch.setattr(service, "fetch_flights", fake_fetch)
+
+    # 'l' -> list, pick '2' (GOT), then 'q' to exit menu
+    await menu.main_async(
+        inputs=_fake_input(["l", "2", "q"]),
+        now_iso="2026-06-17T00:00:00Z",
+    )
+    out = capsys.readouterr().out
+    assert "Arlanda" in out      # the list was printed
+    assert "airport: GOT" in out  # number 2 resolved to GOT
+
+
+def test_choose_from_list_resolves_number_and_code():
+    assert menu._choose_from_list(_fake_input(["1"])) == "ARN"
+    assert menu._choose_from_list(_fake_input(["GOT"])) == "GOT"
+    assert menu._choose_from_list(_fake_input(["q"])) is None

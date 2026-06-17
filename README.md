@@ -52,9 +52,13 @@ Swedavia Flight Tracker — airport: ARN
   q) Quit
 ```
 
+At the airport prompt press `Enter` for ARN, type a code (e.g. `GOT`), or type
+`l` to pick from a numbered **list of all airports**.
+
 Press `1`, `2`, or `3` to see the **next 10 flights from now** (sorted by time).
-Then press `Enter` for the next 10, `m` to go back to the menu, or `q` to quit.
-Press `a` to switch airport. Times are UTC.
+If the day is almost over, the list rolls into the **following day(s)** so you
+still get a full page. Then press `Enter` for the next 10, `m` to go back to the
+menu, or `q` to quit. Press `a` to switch airport. Times are UTC.
 
 ## Run from the terminal (CLI)
 

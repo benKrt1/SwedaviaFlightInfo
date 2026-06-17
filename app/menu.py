@@ -8,7 +8,7 @@ Launch it from the repo root:
 
 import asyncio
 import sys
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Callable
 
 from app import cli, config, service
@@ -16,6 +16,7 @@ from app.models import Flight
 from app.swedavia_client import SwedaviaUnavailable
 
 PAGE = 10
+LOOKAHEAD_DAYS = 2
 
 
 # --- pure helpers -----------------------------------------------------------
@@ -31,6 +32,25 @@ def upcoming_from(flights: list[Flight], now_iso: str) -> list[Flight]:
         f for f in flights if f.scheduledTime and f.scheduledTime >= now_iso
     ]
     return sort_by_time(future)
+
+
+async def collect_upcoming(
+    airport: str,
+    direction: str,
+    now_iso: str,
+    min_count: int = PAGE,
+    lookahead: int = LOOKAHEAD_DAYS,
+) -> list[Flight]:
+    """Gather upcoming flights, rolling into the next day(s) if today is short."""
+    base = date.fromisoformat(now_iso[:10])
+    out: list[Flight] = []
+    for offset in range(lookahead + 1):
+        day = (base + timedelta(days=offset)).isoformat()
+        flights = await service.get_flights(airport, direction, day)
+        out += upcoming_from(flights, now_iso) if offset == 0 else sort_by_time(flights)
+        if len(out) >= min_count:
+            break
+    return out
 
 
 def render_baggage(flights: list[Flight]) -> str:
@@ -83,7 +103,7 @@ async def _show(
 ) -> str:
     """Fetch flights and page through the upcoming ones. Returns 'menu' or 'quit'."""
     try:
-        flights = await service.get_flights(airport, direction, now_iso[:10])
+        flights = await collect_upcoming(airport, direction, now_iso)
     except RuntimeError as exc:
         print(str(exc), file=sys.stderr)
         return "menu"
@@ -91,7 +111,6 @@ async def _show(
         print("Swedavia unavailable. Try again later.", file=sys.stderr)
         return "menu"
 
-    flights = upcoming_from(flights, now_iso)
     if not flights:
         print("No upcoming flights found.")
         return "menu"
@@ -115,12 +134,39 @@ async def _show(
     return "menu"
 
 
-def _ask_airport(inputs: Callable[[str], str]) -> str | None:
-    """Prompt for an airport code (Enter = ARN). Returns code, or None to quit."""
+def _print_airport_list() -> None:
+    print("\nAvailable airports:")
+    for i, code in enumerate(config.VALID_AIRPORTS, 1):
+        print(f"  {i:>2}) {code} — {config.AIRPORT_NAMES[code]}")
+
+
+def _choose_from_list(inputs: Callable[[str], str]) -> str | None:
+    """Show the airport list and resolve a number or code. None on quit."""
+    _print_airport_list()
     while True:
-        raw = inputs("Airport (Enter = ARN, q = quit): ").strip()
-        if raw.lower() == "q":
+        pick = inputs("Pick a number or code (q = quit): ").strip()
+        if pick.lower() == "q":
             return None
+        if pick.isdigit():
+            idx = int(pick)
+            if 1 <= idx <= len(config.VALID_AIRPORTS):
+                return config.VALID_AIRPORTS[idx - 1]
+        else:
+            code = pick.upper()
+            if code in config.VALID_AIRPORTS:
+                return code
+        print(f"Invalid choice '{pick}'. Try again.", file=sys.stderr)
+
+
+def _ask_airport(inputs: Callable[[str], str]) -> str | None:
+    """Prompt for an airport (Enter = ARN, l = list). Returns code, or None to quit."""
+    while True:
+        raw = inputs("Airport (Enter = ARN, l = list, q = quit): ").strip()
+        low = raw.lower()
+        if low == "q":
+            return None
+        if low in ("l", "list"):
+            return _choose_from_list(inputs)
         code = (raw or "ARN").upper()
         if code in config.VALID_AIRPORTS:
             return code
