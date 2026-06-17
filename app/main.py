@@ -38,6 +38,8 @@ async def _load(airport: str, direction: str, date: Optional[str]) -> list[Fligh
     resolved = _resolve_date(date)
     try:
         return await service.get_flights(code, direction, resolved)
+    except RuntimeError as exc:
+        raise HTTPException(status_code=503, detail=str(exc))
     except SwedaviaUnavailable:
         raise HTTPException(status_code=502, detail="Swedavia unavailable")
 

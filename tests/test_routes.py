@@ -104,3 +104,14 @@ def test_upstream_error_returns_502(monkeypatch):
 
     r = client.get("/flights/ARN/departures")
     assert r.status_code == 502
+
+
+def test_missing_api_key_returns_503(monkeypatch):
+    async def fake_fetch(airport, direction, date):
+        raise RuntimeError("SWEDAVIA_API_KEY is not set. Add it to your .env file.")
+
+    monkeypatch.setattr(service, "fetch_flights", fake_fetch)
+
+    r = client.get("/flights/ARN/departures")
+    assert r.status_code == 503
+    assert "SWEDAVIA_API_KEY" in r.json()["detail"]
