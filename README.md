@@ -45,11 +45,11 @@ Just run the program and pick from a menu — no arguments to remember:
 ```
 Swedavia Flight Tracker — airport: ARN
 
-  1) Αποσκευές (baggage / belts)
-  2) Αναχωρήσεις (departures)
-  3) Αφίξεις (arrivals)
-  a) Άλλο αεροδρόμιο
-  q) Έξοδος
+  1) Baggage (belts)
+  2) Departures
+  3) Arrivals
+  a) Change airport
+  q) Quit
 ```
 
 Press `1`, `2`, or `3` to see the **next 10 flights from now** (sorted by time).

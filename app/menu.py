@@ -65,11 +65,11 @@ def render_baggage(flights: list[Flight]) -> str:
 _MENU = """
 Swedavia Flight Tracker — airport: {airport}
 
-  1) Αποσκευές (baggage / belts)
-  2) Αναχωρήσεις (departures)
-  3) Αφίξεις (arrivals)
-  a) Άλλο αεροδρόμιο
-  q) Έξοδος
+  1) Baggage (belts)
+  2) Departures
+  3) Arrivals
+  a) Change airport
+  q) Quit
 """
 
 
@@ -104,9 +104,9 @@ async def _show(
         offset += page
         remaining = len(flights) - offset
         if remaining <= 0:
-            print("\n(τέλος λίστας)")
+            print("\n(end of list)")
             break
-        print(f"\n[Enter] επόμενες {min(page, remaining)}   ·   [m] μενού   ·   [q] έξοδος")
+        print(f"\n[Enter] next {min(page, remaining)}   ·   [m] menu   ·   [q] quit")
         choice = inputs("> ").strip().lower()
         if choice == "q":
             return "quit"
@@ -118,14 +118,14 @@ async def _show(
 def _ask_airport(inputs: Callable[[str], str]) -> str | None:
     """Prompt for an airport code (Enter = ARN). Returns code, or None to quit."""
     while True:
-        raw = inputs("Αεροδρόμιο (Enter = ARN, q = έξοδος): ").strip()
+        raw = inputs("Airport (Enter = ARN, q = quit): ").strip()
         if raw.lower() == "q":
             return None
         code = (raw or "ARN").upper()
         if code in config.VALID_AIRPORTS:
             return code
         print(
-            f"Άκυρο '{raw}'. Έγκυρα: {', '.join(config.VALID_AIRPORTS)}",
+            f"Invalid '{raw}'. Valid codes: {', '.join(config.VALID_AIRPORTS)}",
             file=sys.stderr,
         )
 
@@ -140,7 +140,7 @@ async def main_async(inputs: Callable[[str], str] = input, now_iso: str | None =
 
     while True:
         print(_MENU.format(airport=airport))
-        choice = inputs("Διάλεξε: ").strip().lower()
+        choice = inputs("Choose: ").strip().lower()
 
         if choice == "q":
             return 0
@@ -163,7 +163,7 @@ async def main_async(inputs: Callable[[str], str] = input, now_iso: str | None =
                 lambda fl: cli.render_table(fl, "arrival"), now_iso, inputs,
             )
         else:
-            print("Διάλεξε 1, 2, 3, a ή q.", file=sys.stderr)
+            print("Please choose 1, 2, 3, a or q.", file=sys.stderr)
             continue
 
         if result == "quit":
