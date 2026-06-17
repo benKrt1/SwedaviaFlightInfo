@@ -11,6 +11,21 @@ VALID_AIRPORTS = [
     "VBY", "KRN", "RNB", "VST", "ORB", "NYO",
 ]
 
+AIRPORT_NAMES = {
+    "ARN": "Stockholm Arlanda",
+    "GOT": "Göteborg Landvetter",
+    "MMX": "Malmö",
+    "BMA": "Stockholm Bromma",
+    "LLA": "Luleå",
+    "UME": "Umeå",
+    "VBY": "Visby",
+    "KRN": "Kiruna",
+    "RNB": "Ronneby",
+    "VST": "Västerås",
+    "ORB": "Örebro",
+    "NYO": "Stockholm Skavsta",
+}
+
 
 def get_api_key() -> str:
     key = os.getenv("SWEDAVIA_API_KEY")
