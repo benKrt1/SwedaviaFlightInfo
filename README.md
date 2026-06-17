@@ -34,6 +34,41 @@ Get a free key at <https://apideveloper.swedavia.se/> (FlightInfo product).
 
 Interactive API docs: <http://127.0.0.1:8000/docs>
 
+## Run from the terminal (CLI)
+
+No server or browser needed — get the flights straight in your terminal:
+
+```bash
+.venv/bin/python -m app.cli ARN departures
+.venv/bin/python -m app.cli ARN arrivals
+.venv/bin/python -m app.cli ARN search SK1824
+```
+
+Output is a table:
+
+```
+Flight  From  Time   Status        Gate  Belt
+SK1824  SKG   22:25  Landed 00:11  E5    6
+SK1428  CPH   22:20  Landed 00:19  E6    5
+```
+
+Options:
+- `--date YYYY-MM-DD` — defaults to today
+- `--status delayed|cancelled|ontime` — filter by status
+- `--destination CPH` — filter by the other airport's IATA code
+- `--json` — print raw JSON instead of the table
+
+Examples:
+
+```bash
+.venv/bin/python -m app.cli ARN departures --status delayed
+.venv/bin/python -m app.cli ARN arrivals --destination CPH
+.venv/bin/python -m app.cli ARN departures --json
+```
+
+Times are shown in UTC. Tip: make it shorter with an alias —
+`alias flights=".venv/bin/python -m app.cli"` then `flights ARN departures`.
+
 ## Endpoints
 
 | Method & path | Description |
@@ -103,6 +138,7 @@ app/
   models.py           # Flight / BaggageInfo + status translation + mapping
   swedavia_client.py  # async httpx client for Swedavia
   service.py          # caching + filtering + search
-  main.py             # FastAPI routes
+  main.py             # FastAPI routes (web API)
+  cli.py              # terminal CLI (same service, no server)
 tests/                # full pytest suite (mocked Swedavia)
 ```
