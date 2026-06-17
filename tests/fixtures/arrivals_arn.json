@@ -1,0 +1,22 @@
+{
+  "flights": [
+    {
+      "flightId": "SK1402",
+      "airlineOperator": { "name": "SAS" },
+      "departureAirportIata": "CPH",
+      "departureAirportSwedish": "Köpenhamn",
+      "arrivalAirportSwedish": "Stockholm Arlanda",
+      "arrivalTime": {
+        "scheduledUtc": "2026-06-17T11:00:00Z",
+        "estimatedUtc": "2026-06-17T11:05:00Z"
+      },
+      "locationAndStatus": {
+        "flightLegStatus": "LAN",
+        "flightLegStatusSwedish": "Landat",
+        "flightLegStatusEnglish": "Landed",
+        "terminal": "5"
+      },
+      "baggage": { "baggageClaimUnit": "3", "firstBag": "11:20", "lastBag": "11:35" }
+    }
+  ]
+}
