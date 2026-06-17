@@ -34,9 +34,31 @@ Get a free key at <https://apideveloper.swedavia.se/> (FlightInfo product).
 
 Interactive API docs: <http://127.0.0.1:8000/docs>
 
+## Interactive menu (easiest)
+
+Just run the program and pick from a menu — no arguments to remember:
+
+```bash
+.venv/bin/python main.py        # or: python3 main.py  (inside the venv)
+```
+
+```
+Swedavia Flight Tracker — airport: ARN
+
+  1) Αποσκευές (baggage / belts)
+  2) Αναχωρήσεις (departures)
+  3) Αφίξεις (arrivals)
+  a) Άλλο αεροδρόμιο
+  q) Έξοδος
+```
+
+Press `1`, `2`, or `3` to see the **next 10 flights from now** (sorted by time).
+Then press `Enter` for the next 10, `m` to go back to the menu, or `q` to quit.
+Press `a` to switch airport. Times are UTC.
+
 ## Run from the terminal (CLI)
 
-No server or browser needed — get the flights straight in your terminal:
+Prefer one-shot commands? Use the CLI instead of the menu:
 
 ```bash
 .venv/bin/python -m app.cli ARN departures
@@ -139,6 +161,8 @@ app/
   swedavia_client.py  # async httpx client for Swedavia
   service.py          # caching + filtering + search
   main.py             # FastAPI routes (web API)
-  cli.py              # terminal CLI (same service, no server)
+  cli.py              # terminal CLI (arguments, same service)
+  menu.py             # interactive terminal menu
+main.py               # launcher for the interactive menu
 tests/                # full pytest suite (mocked Swedavia)
 ```
