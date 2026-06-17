@@ -2,20 +2,24 @@
   "flights": [
     {
       "flightId": "SK1401",
-      "airlineOperator": { "name": "SAS" },
-      "departureAirportSwedish": "Stockholm Arlanda",
       "arrivalAirportSwedish": "Köpenhamn",
-      "arrivalAirportIata": "CPH",
+      "arrivalAirportEnglish": "Copenhagen",
+      "airlineOperator": { "iata": "SK", "icao": "SAS", "name": "SAS" },
       "departureTime": {
         "scheduledUtc": "2026-06-17T10:30:00Z",
         "estimatedUtc": "2026-06-17T10:45:00Z"
       },
       "locationAndStatus": {
+        "terminal": "5",
+        "gate": "A12",
         "flightLegStatus": "DEP",
         "flightLegStatusSwedish": "Avgått",
-        "flightLegStatusEnglish": "Departed",
-        "gate": "A12",
-        "terminal": "5"
+        "flightLegStatusEnglish": "Departed"
+      },
+      "flightLegIdentifier": {
+        "flightId": "SK1401",
+        "departureAirportIata": "ARN",
+        "arrivalAirportIata": "CPH"
       }
     }
   ]

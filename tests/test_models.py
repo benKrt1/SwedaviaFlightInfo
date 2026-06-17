@@ -46,5 +46,5 @@ def test_flight_from_raw_arrival_includes_baggage():
     assert f.status == "Landed"
     assert f.baggage is not None
     assert f.baggage.belt == "3"
-    assert f.baggage.firstBag == "11:20"
-    assert f.baggage.lastBag == "11:35"
+    assert f.baggage.firstBag == "2026-06-17T11:20:00Z"
+    assert f.baggage.lastBag == "2026-06-17T11:35:00Z"

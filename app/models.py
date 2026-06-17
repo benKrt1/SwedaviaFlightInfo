@@ -47,16 +47,21 @@ def _time(raw: dict, key: str) -> dict:
 def flight_from_raw(raw: dict, direction: str, airport: str) -> Flight:
     """Map one raw Swedavia flight dict into our clean Flight model."""
     loc = raw.get("locationAndStatus") or {}
+    leg = raw.get("flightLegIdentifier") or {}
     airline = (raw.get("airlineOperator") or {}).get("name")
 
     if direction == "departure":
         times = _time(raw, "departureTime")
-        other = raw.get("arrivalAirportIata")
+        other = leg.get("arrivalAirportIata")
     else:
         times = _time(raw, "arrivalTime")
-        other = raw.get("departureAirportIata")
+        other = leg.get("departureAirportIata")
 
-    status = translate_status(loc.get("flightLegStatusSwedish"))
+    # Swedavia already supplies an English status; fall back to translating the
+    # Swedish one if the English field is missing.
+    status = loc.get("flightLegStatusEnglish") or translate_status(
+        loc.get("flightLegStatusSwedish")
+    )
 
     baggage = None
     if direction == "arrival":
@@ -64,8 +69,8 @@ def flight_from_raw(raw: dict, direction: str, airport: str) -> Flight:
         if bag:
             baggage = BaggageInfo(
                 belt=bag.get("baggageClaimUnit"),
-                firstBag=bag.get("firstBag"),
-                lastBag=bag.get("lastBag"),
+                firstBag=bag.get("firstBagUtc"),
+                lastBag=bag.get("lastBagUtc"),
             )
 
     return Flight(
