@@ -1,0 +1,14 @@
+# Swedavia secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+venv/
+
+# OS
+.DS_Store
+
+# Local Claude settings
+.claude/
